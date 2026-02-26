@@ -1,0 +1,4 @@
+com/example/jsoneditor/config/WebConfig.class
+com/example/jsoneditor/controller/JsonEditorController.class
+com/example/jsoneditor/JsonEditorApplication.class
+com/example/jsoneditor/controller/JsonEditorController$ValidationResult.class
