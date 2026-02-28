@@ -1,89 +1,190 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:replace="~{layout :: layout(~{::title}, ~{::content})}">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JSON Editor - Spring Boot AdminLTE</title>
+    
+    <!-- AdminLTE CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/css/adminlte.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        .jsoneditor {
+            height: 500px !important;
+        }
+        .btn-action {
+            margin: 5px;
+        }
+        .validation-error {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+        .content-wrapper {
+            min-height: calc(100vh - 112px);
+        }
+    </style>
 </head>
-<body>
-<th:block th:fragment="content">
-    <!-- Content Header -->
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">JSON Editor</h1>
-                </div>
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">JSON Editor</li>
-                    </ol>
+<body class="hold-transition sidebar-mini">
+<div class="wrapper">
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <h3 class="nav-link">JSON Editor - Spring Boot AdminLTE</h3>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <div class="sidebar">
+            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+                <div class="info">
+                    <a href="/" class="d-block">JSON编辑器</a>
                 </div>
             </div>
+            <nav class="mt-2">
+                <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+                    <li class="nav-item">
+                        <a href="/" class="nav-link active">
+                            <i class="nav-icon fas fa-edit"></i>
+                            <p>JSON编辑器</p>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-    </div>
+    </aside>
 
-    <!-- Main Content -->
-    <div class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Edit JSON</h3>
-                            <div class="card-tools">
-                                <button type="button" class="btn btn-tool" data-card-widget="collapse">
-                                    <i class="fas fa-minus"></i>
-                                </button>
+    <!-- Content Wrapper -->
+    <div class="content-wrapper">
+        <section class="content-header">
+            <div class="container-fluid">
+                <div class="row mb-2">
+                    <div class="col-sm-6">
+                        <h1>JSON Editor</h1>
+                    </div>
+                    <div class="col-sm-6">
+                        <ol class="breadcrumb float-sm-right">
+                            <li class="breadcrumb-item"><a href="#">Home</a></li>
+                            <li class="breadcrumb-item active">JSON Editor</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="content">
+            <div class="container-fluid">
+                <!-- Content Header -->
+                <div class="content-header">
+                    <div class="container-fluid">
+                        <div class="row mb-2">
+                            <div class="col-sm-6">
+                                <h1 class="m-0">JSON Editor</h1>
+                            </div>
+                            <div class="col-sm-6">
+                                <ol class="breadcrumb float-sm-right">
+                                    <li class="breadcrumb-item"><a href="#">Home</a></li>
+                                    <li class="breadcrumb-item active">JSON Editor</li>
+                                </ol>
                             </div>
                         </div>
-                        <div class="card-body">
-                            <div class="form-group">
-                                <label for="jsonInput">JSON Input</label>
-                                <textarea id="jsonInput" class="form-control" rows="15" placeholder='Enter your JSON here...'></textarea>
+                    </div>
+                </div>
+
+                <!-- Main Content -->
+                <div class="content">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card card-primary">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Edit JSON</h3>
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group">
+                                            <label for="jsonInput">JSON Input</label>
+                                            <textarea id="jsonInput" class="form-control" rows="15" placeholder='Enter your JSON here...'>[[${defaultJson}]]</textarea>
+                                        </div>
+                                        <div class="form-group">
+                                            <button id="validateBtn" class="btn btn-success mr-2">
+                                                <i class="fas fa-check-circle"></i> Validate & Format
+                                            </button>
+                                            <button id="clearBtn" class="btn btn-secondary mr-2">
+                                                <i class="fas fa-trash"></i> Clear
+                                            </button>
+                                            <button id="sampleBtn" class="btn btn-info">
+                                                <i class="fas fa-file-alt"></i> Load Sample
+                                            </button>
+                                        </div>
+                                        <div id="resultMessage" class="alert alert-dismissible fade show" role="alert" style="display: none;">
+                                            <span id="resultText"></span>
+                                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                                <span aria-hidden="true">&times;</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="form-group">
-                                <button id="validateBtn" class="btn btn-success mr-2">
-                                    <i class="fas fa-check-circle"></i> Validate & Format
-                                </button>
-                                <button id="clearBtn" class="btn btn-secondary mr-2">
-                                    <i class="fas fa-trash"></i> Clear
-                                </button>
-                                <button id="sampleBtn" class="btn btn-info">
-                                    <i class="fas fa-file-alt"></i> Load Sample
-                                </button>
-                            </div>
-                            <div id="resultMessage" class="alert alert-dismissible fade show" role="alert" style="display: none;">
-                                <span id="resultText"></span>
-                                <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card card-success">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Formatted JSON Output</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <pre id="jsonOutput" class="bg-light p-3" style="min-height: 200px; white-space: pre-wrap; word-break: break-all;"></pre>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="card card-success">
-                        <div class="card-header">
-                            <h3 class="card-title">Formatted JSON Output</h3>
-                        </div>
-                        <div class="card-body">
-                            <pre id="jsonOutput" class="bg-light p-3" style="min-height: 200px; white-space: pre-wrap; word-break: break-all;"></pre>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        </section>
     </div>
-</th:block>
 
-<th:block th:fragment="scripts">
-    <script>
-        $(document).ready(function() {
-            // Load sample JSON
-            $('#sampleBtn').click(function() {
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="float-right d-none d-sm-block">
+            <b>版本</b> 1.0.0
+        </div>
+        <strong>Copyright &copy; 2026 JSON编辑器.</strong> 保留所有权利.
+    </footer>
+</div>
+
+<!-- jQuery -->
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- AdminLTE App -->
+<script src="https://cdn.jsdelivr.net/npm/admin-lte@3.2/dist/js/adminlte.min.js"></script>
+
+<!-- Page specific scripts -->
+<script>
+    $(document).ready(function() {
+        console.log('JSON Editor page loaded');
+        
+        // Load sample JSON
+        $('#sampleBtn').click(function(e) {
+            e.preventDefault();
+            console.log('Load Sample button clicked');
+            try {
                 const sampleJson = {
                     "name": "John Doe",
                     "age": 30,
@@ -97,59 +198,79 @@
                     "isActive": true
                 };
                 $('#jsonInput').val(JSON.stringify(sampleJson, null, 2));
-            });
-
-            // Clear input
-            $('#clearBtn').click(function() {
-                $('#jsonInput').val('');
-                $('#jsonOutput').text('');
-                hideResultMessage();
-            });
-
-            // Validate and format JSON
-            $('#validateBtn').click(function() {
-                const jsonInput = $('#jsonInput').val().trim();
-                
-                if (!jsonInput) {
-                    showResultMessage('Please enter JSON to validate.', 'warning');
-                    return;
-                }
-
-                try {
-                    const parsedJson = JSON.parse(jsonInput);
-                    const formattedJson = JSON.stringify(parsedJson, null, 2);
-                    $('#jsonOutput').text(formattedJson);
-                    showResultMessage('JSON is valid and formatted successfully!', 'success');
-                } catch (error) {
-                    showResultMessage('Invalid JSON: ' + error.message, 'danger');
-                    $('#jsonOutput').text('');
-                }
-            });
-
-            // Handle Enter key in textarea (Ctrl+Enter to validate)
-            $('#jsonInput').keydown(function(e) {
-                if (e.ctrlKey && e.key === 'Enter') {
-                    e.preventDefault();
-                    $('#validateBtn').click();
-                }
-            });
-
-            function showResultMessage(message, type) {
-                $('#resultText').text(message);
-                $('#resultMessage')
-                    .removeClass('alert-success alert-danger alert-warning')
-                    .addClass('alert-' + type)
-                    .show();
+                console.log('Sample JSON loaded successfully');
+            } catch (error) {
+                console.error('Error loading sample JSON:', error);
             }
+        });
 
-            function hideResultMessage() {
-                $('#resultMessage').hide();
-            }
-
-            // Initialize with empty state
+        // Clear input
+        $('#clearBtn').click(function(e) {
+            e.preventDefault();
+            console.log('Clear button clicked');
+            $('#jsonInput').val('');
+            $('#jsonOutput').text('');
             hideResultMessage();
         });
-    </script>
-</th:block>
+
+        // Validate and format JSON
+        $('#validateBtn').click(function(e) {
+            e.preventDefault();
+            console.log('Validate button clicked');
+            const jsonInput = $('#jsonInput').val().trim();
+            
+            if (!jsonInput) {
+                showResultMessage('Please enter JSON to validate.', 'warning');
+                return;
+            }
+
+            try {
+                const parsedJson = JSON.parse(jsonInput);
+                const formattedJson = JSON.stringify(parsedJson, null, 2);
+                $('#jsonOutput').text(formattedJson);
+                showResultMessage('JSON is valid and formatted successfully!', 'success');
+            } catch (error) {
+                showResultMessage('Invalid JSON: ' + error.message, 'danger');
+                $('#jsonOutput').text('');
+            }
+        });
+
+        // Handle Enter key in textarea (Ctrl+Enter to validate)
+        $('#jsonInput').keydown(function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                $('#validateBtn').click();
+            }
+        });
+
+        function showResultMessage(message, type) {
+            $('#resultText').text(message);
+            $('#resultMessage')
+                .removeClass('alert-success alert-danger alert-warning')
+                .addClass('alert-' + type)
+                .show();
+        }
+
+        function hideResultMessage() {
+            $('#resultMessage').hide();
+        }
+
+        // Initialize with default JSON if available
+        const defaultJson = /*[[${defaultJson}]]*/ '';
+        if (defaultJson) {
+            $('#jsonInput').val(defaultJson);
+        }
+        
+        // Initialize with empty state
+        hideResultMessage();
+        
+        // Check if jQuery is loaded
+        if (typeof $ === 'undefined') {
+            console.error('jQuery is not loaded!');
+        } else {
+            console.log('jQuery version:', $.fn.jquery);
+        }
+    });
+</script>
 </body>
 </html>
