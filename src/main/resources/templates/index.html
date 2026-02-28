@@ -153,6 +153,45 @@
                                 </div>
                             </div>
                         </div>
+
+                        <!-- JSON Comparison Section -->
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card card-info">
+                                    <div class="card-header">
+                                        <h3 class="card-title">JSON 比对 (Compare)</h3>
+                                        <div class="card-tools">
+                                            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+                                                <i class="fas fa-minus"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>JSON 1 (原始)</label>
+                                                    <textarea id="json1" class="form-control" rows="8" placeholder='输入第一个JSON...'></textarea>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>JSON 2 (比较)</label>
+                                                    <textarea id="json2" class="form-control" rows="8" placeholder='输入第二个JSON...'></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button id="compareBtn" class="btn btn-info mr-2">
+                                            <i class="fas fa-exchange-alt"></i> 比对
+                                        </button>
+                                        <button id="clearCompareBtn" class="btn btn-secondary">
+                                            <i class="fas fa-trash"></i> 清除
+                                        </button>
+                                        <div id="compareResult" class="alert mt-3" style="display: none;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -263,6 +302,51 @@
         
         // Initialize with empty state
         hideResultMessage();
+        
+        // JSON Compare functionality
+        $('#compareBtn').click(function(e) {
+            e.preventDefault();
+            const json1 = $('#json1').val().trim();
+            const json2 = $('#json2').val().trim();
+            
+            if (!json1 || !json2) {
+                $('#compareResult').removeClass('alert-success alert-danger').addClass('alert-warning').text('请输入两个JSON进行比对').show();
+                return;
+            }
+            
+            $.ajax({
+                url: '/compare',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({json1: json1, json2: json2}),
+                success: function(response) {
+                    if (response.identical) {
+                        $('#compareResult').removeClass('alert-warning alert-danger').addClass('alert-success').html('<strong>✅ ' + response.message + '</strong>').show();
+                    } else {
+                        let diffHtml = '<strong>⚠️ ' + response.message + '</strong><ul class="mt-2 mb-0">';
+                        response.differences.forEach(function(diff) {
+                            let icon = diff.type === 'added' ? '➕' : (diff.type === 'removed' ? '➖' : '🔄');
+                            diffHtml += '<li>' + icon + ' ' + diff.path + ': ';
+                            if (diff.value1) diffHtml += '"' + diff.value1 + '" → ';
+                            if (diff.value2) diffHtml += '"' + diff.value2 + '"';
+                            diffHtml += '</li>';
+                        });
+                        diffHtml += '</ul>';
+                        $('#compareResult').removeClass('alert-success alert-warning').addClass('alert-danger').html(diffHtml).show();
+                    }
+                },
+                error: function(xhr) {
+                    $('#compareResult').removeClass('alert-success alert-warning').addClass('alert-danger').text('比对失败: ' + xhr.responseText).show();
+                }
+            });
+        });
+        
+        $('#clearCompareBtn').click(function(e) {
+            e.preventDefault();
+            $('#json1').val('');
+            $('#json2').val('');
+            $('#compareResult').hide();
+        });
         
         // Check if jQuery is loaded
         if (typeof $ === 'undefined') {
